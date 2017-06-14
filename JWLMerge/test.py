@@ -7,8 +7,8 @@ import sqlite3
 largeResults = []
 smallResults = []
 
-connLarge = sqlite3.connect('/home/dirk/Documents/JWLDatabases/userDataLarge.db')
-connSmall = sqlite3.connect('/home/dirk/Documents/JWLDatabases/userDataSmall.db')
+connLarge = sqlite3.connect('userDataLarge.db')
+connSmall = sqlite3.connect('userDataSmall.db')
 
 cursorLarge = connLarge.cursor()
 cursorSmall = connSmall.cursor()
