@@ -7,8 +7,13 @@ import sqlite3
 largeResults = []
 smallResults = []
 
+<<<<<<< HEAD
 connLarge = sqlite3.connect('/home/dirk/Git/fluffy-couscous/JWLMerge/userDataLarge.db')
 connSmall = sqlite3.connect('/home/dirk/Git/fluffy-couscous/JWLMerge/userDataSmall.db')
+=======
+connLarge = sqlite3.connect('/home/dirk/git/fluffy-couscous/JWLMerge/userDataLarge.db')
+connSmall = sqlite3.connect('/home/dirk/git/fluffy-couscous/JWLMerge/userDataSmall.db')
+>>>>>>> 6bde7a2930f455b58bfb6563b6e6c0ec7e98619d
 
 cursorLarge = connLarge.cursor()
 cursorSmall = connSmall.cursor()
