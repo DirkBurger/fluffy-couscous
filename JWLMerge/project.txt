@@ -1,0 +1,12 @@
+
+|__	01.		get 'Location' table from 'userDataSmall.db'
+|__	02.		get 'Location' table from 'userDataLarge.db'
+|__	03.		get largest value of 'LocationId' from 'Location' table 'userDataLarge.db'
+|__	04.		find entries in 'Location' table 'userDataSmall.db' that ARE in 'Location' table 'userDataLarge.db' (based on 'BookNumber' & 'ChapterNumber')
+|	|__	04b	    if 'Title' in 'Location' table 'userDataLarge.db' is NULL, set correct
+|
+|__	05.		change 'LocationId' in 'Notes' table 'userDataSmall.db' with correct 'LocationId' in 'Location' table 'userDataLarge.db'
+|__	06.		find entries in 'Location' table 'userDataSmall.db' that are NOT in 'Location' table 'userDataLarge.db' (based on 'BookNumber' & 'ChapterNumber')
+|__	07.		create new entries in 'Location' table 'userDataLarge.db' starting at largest 'LocationId' + 1 (03.) based on entries from 'Location' table 'userDataSmall.db'
+|__	08.		change 'LocationId' in 'Notes' table 'userDataSmall.db' with correct 'LocationId' in 'Location' table 'userDataLarge.db'
+|__	09.		apend 'Notes' table 'userDataSmall.db' to end of 'Notes' table 'userDataLarge.db'

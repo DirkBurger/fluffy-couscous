@@ -7,8 +7,8 @@ import sqlite3
 largeResults = []
 smallResults = []
 
-connLarge = sqlite3.connect('userDataLarge.db')
-connSmall = sqlite3.connect('userDataSmall.db')
+connLarge = sqlite3.connect('/home/dirk/Git/fluffy-couscous/JWLMerge/userDataLarge.db')
+connSmall = sqlite3.connect('/home/dirk/Git/fluffy-couscous/JWLMerge/userDataSmall.db')
 
 cursorLarge = connLarge.cursor()
 cursorSmall = connSmall.cursor()
@@ -27,6 +27,10 @@ for similarItem in similarResults:
     cursorLarge.execute('SELECT * FROM Location WHERE Title=?', title)
     print cursorLarge.fetchall()
 
+# if Title (large) is NOT NULL, change Locationid in Notes table (small) to LocationId (large)
+# if Title (large) is NULL, set correct, change Locationid in Notes table (small) to LocationId (large)
+# get the largest value of LocationId from Location table (large)
+#
 
 
 connLarge.close()
