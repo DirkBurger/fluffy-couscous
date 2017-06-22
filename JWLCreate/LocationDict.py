@@ -29,7 +29,6 @@ sql_file = open("JWLCreate/Locations.sql", "w+")
 for pair in dict.iteritems():
     query = query_start + str(pair[0]) + (str(pair[1]).replace("]", "")).replace("[", ",") + query_end
     sql_file.write(query.replace("'NULL'", "NULL")) 
-    print query
+    print (query.replace("'NULL'", "NULL"))
 
 sql_file.close()
-
