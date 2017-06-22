@@ -19,7 +19,7 @@ for row in sheet.iter_rows():
         listRow.append(cell.value)
         book_number = bible_book_lookup[listRow[0]]
     query_key = str(location_id)   
-    query_values = [int(book_number), int(listRow[1]), "NULL", "NULL", 0, "nwt", 0, 0, (str(listRow[0]) + " " + str(listRow[1]))]
+    query_values = [int(book_number), int(listRow[1]), 'NULL', 'NULL', 0, "nwt", 0, 0, (str(listRow[0]) + " " + str(listRow[1]))]
      
     if str(query_values) not in dict.itervalues():
         dict[str(location_id)] = str(query_values)
@@ -28,7 +28,7 @@ for row in sheet.iter_rows():
 sql_file = open("JWLCreate/Locations.sql", "w+")
 for pair in dict.iteritems():
     query = query_start + str(pair[0]) + (str(pair[1]).replace("]", "")).replace("[", ",") + query_end
-    sql_file.write(query) 
+    sql_file.write(query.replace("'NULL'", "NULL")) 
     print query
 
 sql_file.close()
