@@ -1,5 +1,15 @@
+# 1. Create list of rows from spreadsheet
+# 2. Create 'Location specific' list with no duplicates
+# 3. Use the above to populate the 'Location' table in the userData.db
+# 4. Populate the 'Note' table using information from thespreadsheet and
+#       ensure correct 'LocationId' based on lookup of newly populated 
+#       'Location' table
+
 from openpyxl import load_workbook
 import sqlite3
+import uuid
+from pytz import timezone
+from datetime import datetime
 
 ### function to retrieve next usable 'locationId' from 'Locations' table in userData.db
 def get_next_usable_location_id(sqlite3_connection):
@@ -41,43 +51,78 @@ bible_book_lookup = {'Genesis':'1', 'Exodus':'2', 'Leviticus':'3', 'Numbers':'4'
 query_statement_start = "INSERT INTO Location(LocationId,BookNumber,ChapterNumber,DocumentId,Track,IssueTagNumber,KeySymbol,MepsLanguage,Type,Title) VALUES("
 query_statement_end = ");"
 
-### Create List of ALL rows from spreadsheet
+### Create List of ALL rows from spreadsheet 
 Row_List_With_Dups = []
 for row in sheet.iter_rows():
     Row_List_With_Dups_Row = []
-    for cell in row[:4]:
+    for cell in row:
         Row_List_With_Dups_Row.append(cell.value)
     Row_List_With_Dups.append(Row_List_With_Dups_Row)
 #print Row_List_With_Dups
 
-### Remove duplicates by creating new List
-Row_List_Without_Dups = []
+### Create Location specific list (could have have duplicates)
+Location_List_With_Dups = []
 for row in Row_List_With_Dups:
-    if row not in Row_List_Without_Dups:
-        Row_List_Without_Dups.append(row)
-#print Row_List_Without_Dups
+    Location_List_With_Dups.append(row[:4])
 
-### Craft query strings
-query_statement_start = "INSERT INTO Location(LocationId,BookNumber,ChapterNumber,DocumentId,Track,IssueTagNumber,KeySymbol,MepsLanguage,Type,Title) VALUES("
-query_statement_end = ");"
+### Remove duplicates in Location_List_With_Dups by creating new List
+Location_List_Without_Dups = []
+for row in Location_List_With_Dups:
+    if row not in Location_List_Without_Dups:
+        Location_List_Without_Dups.append(row[:4])
+#print Location_List_Without_Dups
+
+### Craft Location query strings
+location_query_statement_start = "INSERT INTO Location(LocationId,BookNumber,ChapterNumber,DocumentId,Track,IssueTagNumber,KeySymbol,MepsLanguage,Type,Title) VALUES("
+location_query_statement_end = ");"
 sql_connection = sqlite3.Connection('/home/dirk/GitHub/fluffy-couscous/JWLCreate/Test Data/Truely-EMPTY/userData.db')
 sql_connection_cursor=sql_connection.cursor()
 location_id = get_next_usable_location_id(sql_connection)
-for row in Row_List_Without_Dups:
-    query_string = (
-        query_statement_start +
+for row in Location_List_Without_Dups:
+    location_query_string = (
+        location_query_statement_start +
         str(location_id) + "," +
         bible_book_lookup[row[0]] + "," + 
         str(row[1]) + "," +
         'NULL,NULL,0,"nwt",0,0,"' +
         (row[0] + " " + str(row[1])) + '"' +
-        query_statement_end
+        location_query_statement_end
     )
     location_id += 1
-#    print query_string
+    print location_query_string
 
-    ### Execute SQL query against userData.db
- #   sql_connection_cursor.execute(query_string)
- #   sql_connection.commit()
+### Execute SQL query against userData.db
+    sql_connection_cursor.execute(location_query_string)
+    sql_connection.commit()
+
+### Craft Note query strings
+note_query_statement_start = "INSERT INTO Note(NoteId,Guid,UserMarkId,LocationId,Title,Content,LastModified,BlockType,BlockIdentifier) VALUES("
+note_query_statement_end = ");"
+note_id_start = 1
+for row in Row_List_With_Dups:
+    location_id_query_string = (str(row[0] + " " + str(row[1])),)
+    sql_connection_cursor.execute('select LocationId from Location where Title=?', location_id_query_string)
+    note_loction_id = sql_connection_cursor.fetchone()
+    note_query_string = (
+        note_query_statement_start +
+        str(note_id_start) + ',"' +
+        str(uuid.uuid4()) + '",' +
+        "NULL" + "," +
+        str(note_loction_id[0]) + ',"' +
+        row[3] + '","' +
+        row[4] + '","' +
+        (timezone('GMT').localize(datetime.now()).replace(microsecond=0)).isoformat() + '",' +
+        "2" + "," +
+        str(row[2]) +
+        note_query_statement_end
+    )
+    note_id_start += 1
+    print note_query_string
+    sql_connection_cursor.execute(note_query_string)
+    sql_connection.commit()
+
+### Execute SQL query to populate Note table
+
+### Tidy up SQL cursor/connection
 sql_connection_cursor.close()
 sql_connection.close()
