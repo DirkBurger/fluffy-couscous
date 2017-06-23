@@ -118,10 +118,9 @@ for row in Row_List_With_Dups:
     )
     note_id_start += 1
     print note_query_string
+### Execute SQL query to populate Note table
     sql_connection_cursor.execute(note_query_string)
     sql_connection.commit()
-
-### Execute SQL query to populate Note table
 
 ### Tidy up SQL cursor/connection
 sql_connection_cursor.close()
