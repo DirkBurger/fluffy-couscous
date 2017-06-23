@@ -6,7 +6,9 @@ from pytz import timezone
 from datetime import datetime
 
 
-wb = load_workbook('G:/GitHub/fluffy-couscous/JWLCreate/Test Data/Notes-3-Entries.xlsx')
+#wb = load_workbook('G:/GitHub/fluffy-couscous/JWLCreate/Test Data/Notes-3-Entries.xlsx')
+wb = load_workbook('/home/dirk/GitHub/fluffy-couscous/JWLCreate/Test Data/Notes-3-Entries.xlsx')
+
 sheetname = "Sheet1"
 sheet = wb[sheetname]
 notesQueryStart = "INSERT INTO Note(NoteId,Guid,UserMarkId,LocationId,Title,Content,LastModified,BlockType,BlockIdentifier) VALUES("

@@ -27,28 +27,44 @@ bible_book_lookup = {'Genesis':'1', 'Exodus':'2', 'Leviticus':'3', 'Numbers':'4'
 location_id = 1
 query_statement_start = "INSERT INTO Location(LocationId,BookNumber,ChapterNumber,DocumentId,Track,IssueTagNumber,KeySymbol,MepsLanguage,Type,Title) VALUES("
 query_statement_end = ");"
-check_for_dups = []
-query_dict = {}
 
+### Create List of ALL rows from spreadsheet
+Row_List_With_Dups = []
 for row in sheet.iter_rows():
-    listRow = []
-    for cell in row:
-        listRow.append(cell.value)
-    book_number = bible_book_lookup[listRow[0]]
-    query_dict_key = str(location_id)   
-    query_dict_values = [int(book_number), int(listRow[1]), 'NULL', 'NULL', 0, "nwt", 0, 0, (str(listRow[0]) + " " + str(listRow[1]))]
-     
-    if str(query_dict_values) not in query_dict.itervalues():
-        query_dict[str(location_id)] = str(query_dict_values)
-        location_id = location_id + 1
+    Row_List_With_Dups_Row = []
+    for cell in row[:4]:
+        Row_List_With_Dups_Row.append(cell.value)
+    Row_List_With_Dups.append(Row_List_With_Dups_Row)
+#print Row_List_With_Dups
 
-conn = sqlite3.Connection('/home/dirk/GitHub/fluffy-couscous/JWLCreate/Test Data/Truely-EMPTY/userData.db')
-c=conn.cursor()
-for pair in query_dict.iteritems():
-    query = query_statement_start + str(pair[0]) + (str(pair[1]).replace("]", "")).replace("[", ",") + query_statement_end
-    final_query = (query.replace("'NULL'", "NULL")) 
-    c.execute(final_query)
-    conn.commit()
-c.close()
-conn.close()
+### Remove duplicates by creating new List
+Row_List_Without_Dups = []
+for row in Row_List_With_Dups:
+    if row not in Row_List_Without_Dups:
+        Row_List_Without_Dups.append(row)
+#print Row_List_Without_Dups
 
+### Craft query strings
+query_statement_start = "INSERT INTO Location(LocationId,BookNumber,ChapterNumber,DocumentId,Track,IssueTagNumber,KeySymbol,MepsLanguage,Type,Title) VALUES("
+query_statement_end = ");"
+sql_connection = sqlite3.Connection('/home/dirk/GitHub/fluffy-couscous/JWLCreate/Test Data/Truely-EMPTY/userData.db')
+sql_connection_cursor=sql_connection.cursor()
+location_id = 1
+for row in Row_List_Without_Dups:
+    query_string = (
+        query_statement_start +
+        str(location_id) + "," +
+        bible_book_lookup[row[0]] + "," + 
+        str(row[1]) + "," +
+        'NULL,NULL,0,"nwt",0,0,"' +
+        (row[0] + " " + str(row[1])) + '"' +
+        query_statement_end
+    )
+    location_id += 1
+#    print query_string
+
+    ### Execute SQL query against userData.db
+    sql_connection_cursor.execute(query_string)
+    sql_connection.commit()
+sql_connection_cursor.close()
+sql_connection.close()
