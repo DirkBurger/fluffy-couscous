@@ -1,6 +1,20 @@
 from openpyxl import load_workbook
 import sqlite3
 
+### function to retrieve next usable 'locationId' from 'Locations' table in userData.db
+def get_next_usable_location_id(sqlite3_connection):
+    cursor = sqlite3_connection.cursor()
+    for value_q1 in cursor.execute('SELECT COUNT(*) from Location'):
+        if value_q1[0] != 0:
+            location_ids = []
+            for value_q2 in cursor.execute('SELECT LocationId FROM Location'):
+                location_ids += value_q2
+            next_usable_location_id = max(location_ids) + 1
+            return next_usable_location_id
+        else:
+            return int(1)
+    cursor.close()
+
 #wb = load_workbook('D:\GitHub\Python_Scripts/Notes-3-Entries.xlsx')
 wb = load_workbook('/home/dirk/GitHub/fluffy-couscous/JWLCreate/Test Data/Notes-3-Entries.xlsx')
 sheetname = "Sheet1"
@@ -24,7 +38,6 @@ bible_book_lookup = {'Genesis':'1', 'Exodus':'2', 'Leviticus':'3', 'Numbers':'4'
 '1 Peter':'60', '2 Peter':'61', '1 John':'62', '2 John':'63', 
 '3 John':'64', 'Jude':'65', 'Revelation':'66'}
 
-location_id = 1
 query_statement_start = "INSERT INTO Location(LocationId,BookNumber,ChapterNumber,DocumentId,Track,IssueTagNumber,KeySymbol,MepsLanguage,Type,Title) VALUES("
 query_statement_end = ");"
 
@@ -49,7 +62,7 @@ query_statement_start = "INSERT INTO Location(LocationId,BookNumber,ChapterNumbe
 query_statement_end = ");"
 sql_connection = sqlite3.Connection('/home/dirk/GitHub/fluffy-couscous/JWLCreate/Test Data/Truely-EMPTY/userData.db')
 sql_connection_cursor=sql_connection.cursor()
-location_id = 1
+location_id = get_next_usable_location_id(sql_connection)
 for row in Row_List_Without_Dups:
     query_string = (
         query_statement_start +
@@ -64,7 +77,7 @@ for row in Row_List_Without_Dups:
 #    print query_string
 
     ### Execute SQL query against userData.db
-    sql_connection_cursor.execute(query_string)
-    sql_connection.commit()
+ #   sql_connection_cursor.execute(query_string)
+ #   sql_connection.commit()
 sql_connection_cursor.close()
 sql_connection.close()
